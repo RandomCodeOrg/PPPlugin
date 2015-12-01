@@ -38,11 +38,19 @@ public class PContext {
 		this.classPaths = Collections.unmodifiableList(classPaths);
 	}
 
-	
+	/**
+	 * Returns a unmodifiable set containing the projects compiled classes.
+	 * @return A unmodifiable set containing the projects compiled classes.
+	 */
 	public Set<Class<?>> getClasses() {
 		return classes;
 	}
 
+	/**
+	 * Returns the file object representing the .class-file of the given class.
+	 * @param c The class thats corresponding file should be returned.
+	 * @return The file object representing the .class-file of the given class or {@code null} if there is none.
+	 */
 	public File getFile(Class<?> c) {
 		if (classFileMap.containsKey(c))
 			return classFileMap.get(c);
@@ -50,23 +58,42 @@ public class PContext {
 			return null;
 	}
 
+	/**
+	 * Returns the root directory of all compiled classes.
+	 * @return The root directory of all compiled classes.
+	 */
 	public File getClassRoot() {
 		return classRoot;
 	}
 
+	/**
+	 * Returns the maven build log.
+	 * @return The maven build log.
+	 */
 	public Log getLog() {
 		return log;
 	}
 
+	/**
+	 * Marks the .class-file representing the given class as edited and returns an {@link OutputStream} that will hold the new data.
+	 * <b>Note</b>: Calling this method a second time will discard all previous changes.
+	 * @param cl The class thats corresponding .class-file should be overwritten. 
+	 * @return An output stream that will hold the new data.
+	 */
 	public OutputStream modify(Class<?> cl) {
 		ConnectedStreams cs = new ConnectedStreams();
 		modifications.put(cl, cs);
 		return cs.getOut();
 	}
 
+	/**
+	 * Returns an unmodifiable set containing all additional class paths. This includes compile-, test- and runtime-scoped libraries/dependencies.
+	 * @return An unmodifiable set containing all additional class paths. This includes compile-, test- and runtime-scoped libraries/dependencies.
+	 */
 	public List<String> getClassPaths(){
 		return classPaths;
 	}
+	
 	
 	void complete() throws IOException {
 		for (Class<?> cl : modifications.keySet()) {
