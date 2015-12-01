@@ -16,6 +16,11 @@ import org.codehaus.plexus.util.IOUtil;
 
 import com.github.masinger.ppplugin.internals.ConnectedStreams;
 
+/**
+ * Contains information about the compiled sources and classes.
+ * @author Marcel Singer
+ *
+ */
 public class PContext {
 
 	private final Set<Class<?>> classes;
@@ -33,6 +38,7 @@ public class PContext {
 		this.classPaths = Collections.unmodifiableList(classPaths);
 	}
 
+	
 	public Set<Class<?>> getClasses() {
 		return classes;
 	}
