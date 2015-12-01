@@ -6,7 +6,24 @@
 	<version>0.0.1</version>
 	<packaging>maven-plugin</packaging>
 	<name>Post Processor Plugin</name>
-	<url>http://maven.apache.org</url>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<url>https://github.com/RandomCodeOrg/PPPlugin</url>
+	<developers>
+		<developer>
+			<id>RandomCodeOrg</id>
+			<name>RandomCodeOrg-Team</name>
+		</developer>
+	</developers>
+	<scm>
+		<url>https://github.com/RandomCodeOrg/PPPlugin.git</url>
+	</scm>
+	<description>A maven plugin that executes one or multiple user defined processors that can be used to transform or modify the compilation result.</description>
 	<build>
 		<plugins>
 			<plugin>
