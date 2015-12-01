@@ -32,7 +32,6 @@ public class PostProcessMojo extends AbstractMojo {
 	private MavenProject project;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// TODO Auto-generated method stub
 		try {
 			execute(String.format("%s%s%s", projectBuildDir, File.separator, "classes"));
 		} catch (Throwable e) {
@@ -96,7 +95,6 @@ public class PostProcessMojo extends AbstractMojo {
 		Set<URL> urls = new HashSet<URL>();
 	    List<String> elements = getAllClasspaths();
 	    for (String element : elements) {
-	    	getLog().info(String.format("Adding dependency: %s", element));
 	        urls.add(new File(element).toURI().toURL());
 	    }
 	    return new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
