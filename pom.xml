@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.randomcodeorg.ppplugin</groupId>
 	<artifactId>ppplugin</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.3</version>
 	<packaging>maven-plugin</packaging>
 	<name>Post Processor Plugin</name>
 	<licenses>
@@ -30,7 +30,7 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>3.4</version>
 				<configuration>
-					<goalPrefix>ppp</goalPrefix>
+					<goalPrefix>pp</goalPrefix>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 				</configuration>
 			</plugin>

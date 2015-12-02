@@ -1,4 +1,4 @@
-package com.github.masinger.ppplugin;
+package com.github.randomcodeorg.ppplugin;
 
 /**
  * A processor that will be called after the compilation.

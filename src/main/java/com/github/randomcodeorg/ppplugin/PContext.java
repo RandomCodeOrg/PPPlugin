@@ -1,4 +1,4 @@
-package com.github.masinger.ppplugin;
+package com.github.randomcodeorg.ppplugin;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,7 +14,7 @@ import java.util.Set;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.IOUtil;
 
-import com.github.masinger.ppplugin.internals.ConnectedStreams;
+import com.github.randomcodeorg.ppplugin.internals.ConnectedStreams;
 
 /**
  * Contains information about the compiled sources and classes.
