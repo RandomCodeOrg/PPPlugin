@@ -1,7 +1,7 @@
 package com.github.randomcodeorg.ppplugin.internals;
 
-public interface ErrorHandler<T extends Throwable> {
+public interface ErrorHandler<T extends Throwable, E> {
 
-	boolean handleError(T e);
+	boolean handleError(T e, E extra);
 	
 }

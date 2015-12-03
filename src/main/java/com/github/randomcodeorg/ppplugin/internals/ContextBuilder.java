@@ -6,12 +6,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
 import com.github.randomcodeorg.ppplugin.PostProcessMojo;
@@ -25,7 +28,8 @@ class ContextBuilder {
 	private URL[] fixedClassPathsArray;
 	private static final String DEFAULT_COMPILED_CLASSES_SUB = "classes";
 	private boolean initialized = false;
-
+	private Log log;
+	
 	public ContextBuilder() {
 
 	}
@@ -35,12 +39,24 @@ class ContextBuilder {
 		if (initialized)
 			return;
 		setupDirectories(mojo);
+		log = mojo.getLog();
 		setupFixedClassPathEntries(mojo);
 		initialized = true;
 	}
 
+	public PContextImpl createContext(Log log, ClassLoader parentLoader,
+			ErrorHandler<? super Throwable, ? super File> handler) throws ClassNotFoundException, MalformedURLException {
+		Set<File> classFiles = createClassFilesSet();
+		ClassLoader loader = createInitializationClassLoader(parentLoader);
+		Map<Class<?>, File> classMap = createClassFileMap(loader, classFiles, handler);
+		List<String> classPathList = new ArrayList<String>();
+		classPathList.addAll(fixedClassPathEntries);
+		PContextImpl result = new PContextImpl(log, compilationResultsRoot, classPathList, classMap.keySet(), classMap);
+		return result;
+	}
+
 	public Map<Class<?>, File> createClassFileMap(ClassLoader loader, Set<File> classFileSet,
-			ErrorHandler<? super Throwable> handler) throws ClassNotFoundException {
+			ErrorHandler<? super Throwable, ? super File> handler) throws ClassNotFoundException {
 		Map<Class<?>, File> result = new HashMap<Class<?>, File>();
 		String className;
 		Class<?> someClass;
@@ -48,23 +64,25 @@ class ContextBuilder {
 			try {
 				className = f.getAbsolutePath().substring(compilationResultsRoot.getAbsolutePath().length() + 1,
 						f.getAbsolutePath().length() - 6).replace("/", ".").replace("\\", ".");
+				log.debug(String.format("Loading class '%s'", className));
 				someClass = loader.loadClass(className);
 				result.put(someClass, f);
 			} catch (RuntimeException e) {
-				executeHandler(handler, e);
+				executeHandler(handler, e, f);
 			} catch (ClassNotFoundException e) {
-				executeHandler(handler, e);
+				executeHandler(handler, e, f);
 			} catch (NoClassDefFoundError e) {
-				executeHandler(handler, e);
+				executeHandler(handler, e, f);
 			}
 		}
 		return result;
 	}
 
-	private <T extends Throwable> void executeHandler(ErrorHandler<? super T> handler, T e) throws T {
+	private <T extends Throwable> void executeHandler(ErrorHandler<? super T, ? super File> handler, T e, File extra)
+			throws T {
 		if (handler == null)
 			throw e;
-		if (!handler.handleError(e))
+		if (!handler.handleError(e, extra))
 			throw e;
 	}
 

@@ -21,7 +21,7 @@ import com.github.randomcodeorg.ppplugin.internals.ConnectedStreams;
  * @author Marcel Singer
  *
  */
-public class PContext {
+public abstract class PContext {
 
 	private final Set<Class<?>> classes;
 	private final Map<Class<?>, File> classFileMap;
@@ -30,7 +30,7 @@ public class PContext {
 	private final Map<Class<?>, InputStream> modifications = new HashMap<Class<?>, InputStream>();
 	private final List<String> classPaths;
 
-	PContext(final Log logger, File classRoot, List<String> classPaths, Set<Class<?>> classes, Map<Class<?>, File> classFileMap) {
+	protected PContext(final Log logger, File classRoot, List<String> classPaths, Set<Class<?>> classes, Map<Class<?>, File> classFileMap) {
 		this.classes = Collections.unmodifiableSet(classes);
 		this.classFileMap = classFileMap;
 		this.log = logger;
@@ -95,7 +95,7 @@ public class PContext {
 	}
 	
 	
-	void complete() throws IOException {
+	protected void complete() throws IOException {
 		for (Class<?> cl : modifications.keySet()) {
 			InputStream in = modifications.get(cl);
 			File f = getFile(cl);
