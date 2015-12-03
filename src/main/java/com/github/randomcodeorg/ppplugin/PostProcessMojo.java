@@ -23,6 +23,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
+import com.github.randomcodeorg.ppplugin.internals.InternalInvoker;
+
 @Mojo(name = "postprocess", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
 public class PostProcessMojo extends AbstractMojo {
 
@@ -32,12 +34,26 @@ public class PostProcessMojo extends AbstractMojo {
 	private MavenProject project;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		
 		try {
+			new InternalInvoker(this).invoke();
 			execute(String.format("%s%s%s", projectBuildDir, File.separator, "classes"));
 		} catch (Throwable e) {
 			getLog().error(e);
 			throw new MojoFailureException("An exception occured during the execution of this plugin. See the log output for exception details.");
 		}
+	}
+	
+	public String getProjectBuildDir(){
+		return projectBuildDir;
+	}
+	
+	public MavenProject getProject(){
+		return project;
+	}
+	
+	public String getCompiledClassesDir(){
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
