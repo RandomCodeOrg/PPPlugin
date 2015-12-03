@@ -16,8 +16,6 @@ import org.apache.maven.project.MavenProject;
 
 import com.github.randomcodeorg.ppplugin.PostProcessMojo;
 
-import javassist.expr.Handler;
-
 class ContextBuilder {
 
 	private File buildRoot;
@@ -41,17 +39,18 @@ class ContextBuilder {
 		initialized = true;
 	}
 
-	public Map<Class<?>, File> createClassFileMap(ClassLoader loader, Set<File> classFileSet, ErrorHandler<? super Throwable> handler) throws ClassNotFoundException{
+	public Map<Class<?>, File> createClassFileMap(ClassLoader loader, Set<File> classFileSet,
+			ErrorHandler<? super Throwable> handler) throws ClassNotFoundException {
 		Map<Class<?>, File> result = new HashMap<Class<?>, File>();
 		String className;
 		Class<?> someClass;
-		for(File f : classFileSet){
-			try{
-				className = f.getAbsolutePath().substring(compilationResultsRoot.getAbsolutePath().length() + 1, f.getAbsolutePath().length() - 6)
-						.replace("/", ".").replace("\\", ".");
+		for (File f : classFileSet) {
+			try {
+				className = f.getAbsolutePath().substring(compilationResultsRoot.getAbsolutePath().length() + 1,
+						f.getAbsolutePath().length() - 6).replace("/", ".").replace("\\", ".");
 				someClass = loader.loadClass(className);
 				result.put(someClass, f);
-			}catch(RuntimeException e){
+			} catch (RuntimeException e) {
 				executeHandler(handler, e);
 			} catch (ClassNotFoundException e) {
 				executeHandler(handler, e);
@@ -61,14 +60,14 @@ class ContextBuilder {
 		}
 		return result;
 	}
-	
-	
-	
-	private <T extends Throwable> void executeHandler(ErrorHandler<? super T> handler, T e) throws T{
-		if(handler == null) throw e;
-		if(!handler.handleError(e)) throw e;
+
+	private <T extends Throwable> void executeHandler(ErrorHandler<? super T> handler, T e) throws T {
+		if (handler == null)
+			throw e;
+		if (!handler.handleError(e))
+			throw e;
 	}
-	
+
 	public Set<File> createClassFilesSet() {
 		Set<File> result = new HashSet<File>();
 		searchClassFile(compilationResultsRoot, result);
