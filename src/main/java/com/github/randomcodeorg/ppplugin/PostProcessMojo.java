@@ -10,6 +10,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
+import com.github.randomcodeorg.ppplugin.data.maven.MavenBuildDataSource;
 import com.github.randomcodeorg.ppplugin.internals.InternalInvoker;
 
 @Mojo(name = "postprocess", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME)
@@ -23,7 +24,7 @@ public class PostProcessMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
 		try {
-			new InternalInvoker(this).invoke();
+			new InternalInvoker(new MavenBuildDataSource(this)).invoke();
 		} catch (Throwable e) {
 			getLog().error(e);
 			throw new MojoFailureException(

@@ -3,32 +3,31 @@ package com.github.randomcodeorg.ppplugin.internals;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.logging.Log;
-
 import com.github.randomcodeorg.ppplugin.PProcessor;
-import com.github.randomcodeorg.ppplugin.PostProcessMojo;
+import com.github.randomcodeorg.ppplugin.data.BuildDataSource;
+import com.github.randomcodeorg.ppplugin.data.BuildLog;
+import com.github.randomcodeorg.ppplugin.data.DependencyResolutionException;
 
 public class InternalInvoker {
 
-	private final PostProcessMojo mojo;
+	private final BuildDataSource dataSource;
 	private final ContextBuilder contextBuilder;
-	private final Log log;
+	private final BuildLog log;
 	private final ProcessorManager processorManager = new ProcessorManager();
 
-	public InternalInvoker(PostProcessMojo mojo) {
-		this.mojo = mojo;
+	public InternalInvoker(BuildDataSource dataSource) {
+		this.dataSource = dataSource;
 		this.contextBuilder = new ContextBuilder();
-		this.log = mojo.getLog();
+		this.log = dataSource.getLog();
 	}
 
-	protected Log getLog() {
-		return mojo.getLog();
+	protected BuildLog getLog() {
+		return dataSource.getLog();
 	}
 
 	public void invoke()
-			throws FileNotFoundException, IOException, DependencyResolutionRequiredException, ClassNotFoundException {
-		contextBuilder.init(mojo);
+			throws FileNotFoundException, IOException, DependencyResolutionException, ClassNotFoundException {
+		contextBuilder.init(dataSource);
 		ClassLoadingErrorHandler handler = new ClassLoadingErrorHandler(log);
 		ClassLoader parentLoader = getClass().getClassLoader();
 		PContextImpl context;

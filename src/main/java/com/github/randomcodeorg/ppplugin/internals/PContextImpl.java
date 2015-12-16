@@ -6,18 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.plugin.logging.Log;
-
 import com.github.randomcodeorg.ppplugin.PContext;
+import com.github.randomcodeorg.ppplugin.data.BuildLog;
 
 class PContextImpl extends PContext {
 
-	PContextImpl(Log logger, File classRoot, List<String> classPaths, Set<Class<?>> classes,
+	PContextImpl(BuildLog logger, File classRoot, List<String> classPaths, Set<Class<?>> classes,
 			Map<Class<?>, File> classFileMap) {
 		super(logger, classRoot, classPaths, classes, classFileMap);
 	}
 
-	
 	@Override
 	public void complete() throws IOException {
 		super.complete();

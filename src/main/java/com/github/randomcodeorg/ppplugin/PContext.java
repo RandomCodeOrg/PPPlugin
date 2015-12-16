@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.IOUtil;
 
+import com.github.randomcodeorg.ppplugin.data.BuildLog;
 import com.github.randomcodeorg.ppplugin.internals.ConnectedStreams;
 
 /**
  * Contains information about the compiled sources and classes.
+ * 
  * @author Marcel Singer
  *
  */
@@ -25,12 +26,13 @@ public abstract class PContext {
 
 	private final Set<Class<?>> classes;
 	private final Map<Class<?>, File> classFileMap;
-	private final Log log;
+	private final BuildLog log;
 	private final File classRoot;
 	private final Map<Class<?>, InputStream> modifications = new HashMap<Class<?>, InputStream>();
 	private final List<String> classPaths;
 
-	protected PContext(final Log logger, File classRoot, List<String> classPaths, Set<Class<?>> classes, Map<Class<?>, File> classFileMap) {
+	protected PContext(final BuildLog logger, File classRoot, List<String> classPaths, Set<Class<?>> classes,
+			Map<Class<?>, File> classFileMap) {
 		this.classes = Collections.unmodifiableSet(classes);
 		this.classFileMap = classFileMap;
 		this.log = logger;
@@ -40,6 +42,7 @@ public abstract class PContext {
 
 	/**
 	 * Returns a unmodifiable set containing the projects compiled classes.
+	 * 
 	 * @return A unmodifiable set containing the projects compiled classes.
 	 */
 	public Set<Class<?>> getClasses() {
@@ -48,8 +51,11 @@ public abstract class PContext {
 
 	/**
 	 * Returns the file object representing the .class-file of the given class.
-	 * @param c The class thats corresponding file should be returned.
-	 * @return The file object representing the .class-file of the given class or {@code null} if there is none.
+	 * 
+	 * @param c
+	 *            The class thats corresponding file should be returned.
+	 * @return The file object representing the .class-file of the given class
+	 *         or {@code null} if there is none.
 	 */
 	public File getFile(Class<?> c) {
 		if (classFileMap.containsKey(c))
@@ -60,6 +66,7 @@ public abstract class PContext {
 
 	/**
 	 * Returns the root directory of all compiled classes.
+	 * 
 	 * @return The root directory of all compiled classes.
 	 */
 	public File getClassRoot() {
@@ -67,17 +74,22 @@ public abstract class PContext {
 	}
 
 	/**
-	 * Returns the maven build log.
-	 * @return The maven build log.
+	 * Returns the build log.
+	 * 
+	 * @return The build log.
 	 */
-	public Log getLog() {
+	public BuildLog getLog() {
 		return log;
 	}
 
 	/**
-	 * Marks the .class-file representing the given class as edited and returns an {@link OutputStream} that will hold the new data.
-	 * <b>Note</b>: Calling this method a second time will discard all previous changes.
-	 * @param cl The class thats corresponding .class-file should be overwritten. 
+	 * Marks the .class-file representing the given class as edited and returns
+	 * an {@link OutputStream} that will hold the new data. <b>Note</b>: Calling
+	 * this method a second time will discard all previous changes.
+	 * 
+	 * @param cl
+	 *            The class thats corresponding .class-file should be
+	 *            overwritten.
 	 * @return An output stream that will hold the new data.
 	 */
 	public OutputStream modify(Class<?> cl) {
@@ -87,14 +99,17 @@ public abstract class PContext {
 	}
 
 	/**
-	 * Returns an unmodifiable set containing all additional class paths. This includes compile-, test- and runtime-scoped libraries/dependencies.
-	 * @return An unmodifiable set containing all additional class paths. This includes compile-, test- and runtime-scoped libraries/dependencies.
+	 * Returns an unmodifiable set containing all additional class paths. This
+	 * includes compile-, test- and runtime-scoped libraries/dependencies.
+	 * 
+	 * @return An unmodifiable set containing all additional class paths. This
+	 *         includes compile-, test- and runtime-scoped
+	 *         libraries/dependencies.
 	 */
-	public List<String> getClassPaths(){
+	public List<String> getClassPaths() {
 		return classPaths;
 	}
-	
-	
+
 	protected void complete() throws IOException {
 		for (Class<?> cl : modifications.keySet()) {
 			InputStream in = modifications.get(cl);

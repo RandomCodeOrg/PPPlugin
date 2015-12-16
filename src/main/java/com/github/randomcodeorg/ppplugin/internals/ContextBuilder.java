@@ -13,11 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-
-import com.github.randomcodeorg.ppplugin.PostProcessMojo;
+import com.github.randomcodeorg.ppplugin.data.BuildDataSource;
+import com.github.randomcodeorg.ppplugin.data.BuildLog;
+import com.github.randomcodeorg.ppplugin.data.DependencyResolutionException;
+import com.github.randomcodeorg.ppplugin.data.ProjectData;
 
 class ContextBuilder {
 
@@ -28,24 +27,25 @@ class ContextBuilder {
 	private URL[] fixedClassPathsArray;
 	private static final String DEFAULT_COMPILED_CLASSES_SUB = "classes";
 	private boolean initialized = false;
-	private Log log;
-	
+	private BuildLog log;
+
 	public ContextBuilder() {
 
 	}
 
-	public void init(PostProcessMojo mojo)
-			throws FileNotFoundException, IOException, DependencyResolutionRequiredException {
+	public void init(BuildDataSource dataSource)
+			throws FileNotFoundException, IOException, DependencyResolutionException {
 		if (initialized)
 			return;
-		setupDirectories(mojo);
-		log = mojo.getLog();
-		setupFixedClassPathEntries(mojo);
+		setupDirectories(dataSource);
+		log = dataSource.getLog();
+		setupFixedClassPathEntries(dataSource);
 		initialized = true;
 	}
 
-	public PContextImpl createContext(Log log, ClassLoader parentLoader,
-			ErrorHandler<? super Throwable, ? super File> handler) throws ClassNotFoundException, MalformedURLException {
+	public PContextImpl createContext(BuildLog log, ClassLoader parentLoader,
+			ErrorHandler<? super Throwable, ? super File> handler)
+					throws ClassNotFoundException, MalformedURLException {
 		Set<File> classFiles = createClassFilesSet();
 		ClassLoader loader = createInitializationClassLoader(parentLoader);
 		Map<Class<?>, File> classMap = createClassFileMap(loader, classFiles, handler);
@@ -118,9 +118,9 @@ class ContextBuilder {
 		return new URLClassLoader(fixedClassPathsArray, parent);
 	}
 
-	private void setupFixedClassPathEntries(PostProcessMojo mojo)
-			throws DependencyResolutionRequiredException, MalformedURLException {
-		MavenProject project = mojo.getProject();
+	private void setupFixedClassPathEntries(BuildDataSource dataSource)
+			throws DependencyResolutionException, MalformedURLException {
+		ProjectData project = dataSource.getProject();
 		fixedClassPathEntries.addAll(project.getTestClasspathElements());
 		fixedClassPathEntries.addAll(project.getRuntimeClasspathElements());
 		fixedClassPathEntries.addAll(project.getCompileClasspathElements());
@@ -130,14 +130,15 @@ class ContextBuilder {
 		fixedClassPathsArray = fixedClassPaths.toArray(new URL[fixedClassPaths.size()]);
 	}
 
-	private void setupDirectories(PostProcessMojo mojo) throws FileNotFoundException, IOException {
-		buildRoot = new File(mojo.getProjectBuildDir());
+	private void setupDirectories(BuildDataSource dataSource) throws FileNotFoundException, IOException {
+		buildRoot = new File(dataSource.getProjectBuildDir());
 		if (!buildRoot.exists())
 			throw new FileNotFoundException(
-					String.format("The build directory '%s' does not exist", mojo.getProjectBuildDir()));
+					String.format("The build directory '%s' does not exist", dataSource.getProjectBuildDir()));
 		if (!buildRoot.isDirectory())
-			throw new IOException(String.format("The build path '%s' is not a directory", mojo.getProjectBuildDir()));
-		String compiledClassesDir = mojo.getCompiledClassesDir();
+			throw new IOException(
+					String.format("The build path '%s' is not a directory", dataSource.getProjectBuildDir()));
+		String compiledClassesDir = dataSource.getCompiledClassesDir();
 		if (compiledClassesDir == null) {
 			compiledClassesDir = String.format("%s%s%s", buildRoot.getAbsolutePath(), File.separator,
 					DEFAULT_COMPILED_CLASSES_SUB);

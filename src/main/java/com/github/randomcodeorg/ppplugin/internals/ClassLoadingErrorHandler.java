@@ -2,13 +2,13 @@ package com.github.randomcodeorg.ppplugin.internals;
 
 import java.io.File;
 
-import org.apache.maven.plugin.logging.Log;
+import com.github.randomcodeorg.ppplugin.data.BuildLog;
 
 public class ClassLoadingErrorHandler implements ErrorHandler<Throwable, File> {
 
-	private final Log log;
-	
-	public ClassLoadingErrorHandler(Log log) {
+	private final BuildLog log;
+
+	public ClassLoadingErrorHandler(BuildLog log) {
 		this.log = log;
 	}
 
