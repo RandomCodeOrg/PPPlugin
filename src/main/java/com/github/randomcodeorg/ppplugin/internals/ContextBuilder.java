@@ -66,6 +66,7 @@ class ContextBuilder {
 						f.getAbsolutePath().length() - 6).replace("/", ".").replace("\\", ".");
 				log.debug(String.format("Loading class '%s'", className));
 				someClass = loader.loadClass(className);
+				someClass.getCanonicalName();
 				result.put(someClass, f);
 			} catch (RuntimeException e) {
 				executeHandler(handler, e, f);

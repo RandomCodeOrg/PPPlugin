@@ -47,6 +47,7 @@ public class InternalInvoker {
 			}
 			if (processor == null)
 				break;
+			log.info(String.format("Executing processor %s", processor.getClass().getCanonicalName()));
 			processor.init(context);
 			processor.run(context);
 			context.complete();
