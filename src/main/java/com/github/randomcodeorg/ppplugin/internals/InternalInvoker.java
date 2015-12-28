@@ -19,7 +19,7 @@ public class InternalInvoker {
 		this.dataSource = dataSource;
 		this.contextBuilder = new ContextBuilder();
 		this.log = dataSource.getLog();
-		this.processorManager  = new ProcessorManager(dataSource.getThrowExceptionOnCyclicProcessorDependencies());
+		this.processorManager = new ProcessorManager(dataSource.getLog(), dataSource.getThrowExceptionOnCyclicProcessorDependencies());
 	}
 
 	protected BuildLog getLog() {

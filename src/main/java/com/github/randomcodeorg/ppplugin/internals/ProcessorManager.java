@@ -5,23 +5,27 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
+import com.github.randomcodeorg.ppplugin.CyclicProcessorDependenciesException;
 import com.github.randomcodeorg.ppplugin.PContext;
 import com.github.randomcodeorg.ppplugin.PProcessor;
 import com.github.randomcodeorg.ppplugin.RunAfter;
 import com.github.randomcodeorg.ppplugin.RunBefore;
+import com.github.randomcodeorg.ppplugin.data.BuildLog;
 
 public class ProcessorManager {
 
 	private List<String> executedProcessors = new ArrayList<String>();
 	private boolean throwOnCircularDependencies;
+	private final BuildLog log;
 
-	public ProcessorManager(boolean throwOnCircularDependencies) {
+	public ProcessorManager(BuildLog log, boolean throwOnCircularDependencies) {
 		this.throwOnCircularDependencies = throwOnCircularDependencies;
+		this.log = log;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -52,7 +56,7 @@ public class ProcessorManager {
 		Map<Class<? extends PProcessor>, Set<Class<? extends PProcessor>>> successors = new HashMap<Class<? extends PProcessor>, Set<Class<? extends PProcessor>>>();
 		for (Class<? extends PProcessor> p : list) {
 			if (!successors.containsKey(p))
-				successors.put(p, new TreeSet<Class<? extends PProcessor>>());
+				successors.put(p, new HashSet<Class<? extends PProcessor>>());
 			if (p.isAnnotationPresent(RunBefore.class)) {
 				RunBefore before = p.getAnnotation(RunBefore.class);
 				successors.get(p).addAll(findAssignables(list, before.value()));
@@ -61,7 +65,7 @@ public class ProcessorManager {
 				RunAfter after = p.getAnnotation(RunAfter.class);
 				for (Class<? extends PProcessor> successor : findAssignables(list, after.value())) {
 					if (!successors.containsKey(successor))
-						successors.put(successor, new TreeSet<Class<? extends PProcessor>>());
+						successors.put(successor, new HashSet<Class<? extends PProcessor>>());
 					successors.get(successor).add(p);
 				}
 			}
@@ -106,7 +110,8 @@ public class ProcessorManager {
 				time = depthFirstSearchVisit(v, state, visitTimes, finishTimes, successors, predecessors, time);
 			}
 			if (state.get(v).equals('g')) {
-				// Zyklus
+				if (throwOnCircularDependencies)
+					throw new CyclicProcessorDependenciesException(u, v); else log.warn(String.format("You are ignoring a circular processor dependency! Involved classes: %s, %s", u.getName(), v.getName()));
 			}
 		}
 		state.put(u, 'b');
