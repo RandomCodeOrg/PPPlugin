@@ -20,6 +20,9 @@ public class PostProcessMojo extends AbstractMojo {
 	private String projectBuildDir;
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)
 	private MavenProject project;
+	
+	@Parameter(property="ignoreProcessorCycles", defaultValue="false")
+	private boolean ignoreProcessorCycles;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -47,6 +50,10 @@ public class PostProcessMojo extends AbstractMojo {
 	@Override
 	public Log getLog() {
 		return super.getLog();
+	}
+	
+	public boolean getIgnoreProcessorCycles(){
+		return ignoreProcessorCycles;
 	}
 
 }

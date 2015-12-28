@@ -13,12 +13,13 @@ public class InternalInvoker {
 	private final BuildDataSource dataSource;
 	private final ContextBuilder contextBuilder;
 	private final BuildLog log;
-	private final ProcessorManager processorManager = new ProcessorManager();
+	private final ProcessorManager processorManager;
 
 	public InternalInvoker(BuildDataSource dataSource) {
 		this.dataSource = dataSource;
 		this.contextBuilder = new ContextBuilder();
 		this.log = dataSource.getLog();
+		this.processorManager  = new ProcessorManager(dataSource.getThrowExceptionOnCyclicProcessorDependencies());
 	}
 
 	protected BuildLog getLog() {

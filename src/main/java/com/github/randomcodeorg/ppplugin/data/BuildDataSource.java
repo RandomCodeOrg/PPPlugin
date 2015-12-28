@@ -6,5 +6,6 @@ public interface BuildDataSource {
 	String getProjectBuildDir();
 	String getCompiledClassesDir();
 	ProjectData getProject();
+	boolean getThrowExceptionOnCyclicProcessorDependencies();
 	
 }

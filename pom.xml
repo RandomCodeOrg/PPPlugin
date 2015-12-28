@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.randomcodeorg.ppplugin</groupId>
 	<artifactId>ppplugin</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0</version>
 	<packaging>maven-plugin</packaging>
 	<name>Post Processor Plugin</name>
 	<licenses>

@@ -10,11 +10,13 @@ public class MavenBuildDataSource implements BuildDataSource{
 	private final PostProcessMojo mojo;
 	private final BuildLog log;
 	private final ProjectData projectData;
+	private final boolean throwExceptionOnCyclicProcessorDependencies;
 	
 	public MavenBuildDataSource(PostProcessMojo mojo) {
 		this.mojo = mojo;
 		this.log = new MavenBuildLog(mojo.getLog());
 		this.projectData = new MavenProjectData(mojo.getProject());
+		this.throwExceptionOnCyclicProcessorDependencies = !mojo.getIgnoreProcessorCycles();
 	}
 
 	public BuildLog getLog() {
@@ -32,5 +34,11 @@ public class MavenBuildDataSource implements BuildDataSource{
 	public ProjectData getProject() {
 		return projectData;
 	}
+
+	public boolean getThrowExceptionOnCyclicProcessorDependencies() {
+		return throwExceptionOnCyclicProcessorDependencies;
+	}
+	
+	
 
 }
