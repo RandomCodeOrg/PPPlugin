@@ -1,4 +1,4 @@
-# PPPlugin <img src="https://travis-ci.org/RandomCodeOrg/PPPlugin.svg" />
+# PPPlugin <img src="https://travis-ci.org/RandomCodeOrg/PPPlugin.svg" /> [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 A maven plugin that executes one or multiple user defined processors that can be used to transform or modify the compilation result.
 
