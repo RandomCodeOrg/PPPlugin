@@ -11,10 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.util.IOUtil;
 
 import com.github.randomcodeorg.ppplugin.data.BuildLog;
-import com.github.randomcodeorg.ppplugin.internals.ConnectedStreams;
+//import com.github.randomcodeorg.ppplugin.internals.ConnectedStreams;
 
 /**
  * Contains information about the compiled sources and classes.
@@ -41,6 +40,8 @@ public abstract class PContext {
 		this.classPaths = Collections.unmodifiableList(classPaths);
 		this.declaredProcessors = Collections.unmodifiableSet(declaredProcessors);
 	}
+	
+	
 
 	/**
 	 * Returns an unmodifiable set containing the projects compiled classes.
@@ -102,11 +103,11 @@ public abstract class PContext {
 	 *            overwritten.
 	 * @return An output stream that will hold the new data.
 	 */
-	public OutputStream modify(Class<?> cl) {
-		ConnectedStreams cs = new ConnectedStreams();
-		modifications.put(cl, cs);
-		return cs.getOut();
+	public OutputStream modify(Class<?> cl){
+		return doModify(cl, modifications);
 	}
+	
+	protected abstract OutputStream doModify(Class<?> cl, Map<Class<?>, InputStream> modifications);
 
 	/**
 	 * Returns an unmodifiable set containing all additional class paths. This
@@ -125,11 +126,13 @@ public abstract class PContext {
 			InputStream in = modifications.get(cl);
 			File f = getFile(cl);
 			FileOutputStream fos = new FileOutputStream(f, false);
-			IOUtil.copy(in, fos);
+			doCopy(in, fos);
 			fos.flush();
 			fos.close();
 			in.close();
 		}
 	}
+	
+	protected abstract void doCopy(InputStream in, OutputStream out) throws IOException;
 
 }
