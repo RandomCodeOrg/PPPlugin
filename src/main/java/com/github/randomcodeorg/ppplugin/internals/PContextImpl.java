@@ -7,13 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.randomcodeorg.ppplugin.PContext;
+import com.github.randomcodeorg.ppplugin.PProcessor;
 import com.github.randomcodeorg.ppplugin.data.BuildLog;
 
 class PContextImpl extends PContext {
 
 	PContextImpl(BuildLog logger, File classRoot, List<String> classPaths, Set<Class<?>> classes,
-			Map<Class<?>, File> classFileMap) {
-		super(logger, classRoot, classPaths, classes, classFileMap);
+			Map<Class<?>, File> classFileMap, Set<Class<? extends PProcessor>> declaredProcessors) {
+		super(logger, classRoot, classPaths, classes, classFileMap, declaredProcessors);
 	}
 
 	@Override

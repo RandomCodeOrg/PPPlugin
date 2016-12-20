@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.randomcodeorg.ppplugin.PProcessor;
 import com.github.randomcodeorg.ppplugin.data.BuildDataSource;
 import com.github.randomcodeorg.ppplugin.data.BuildLog;
 import com.github.randomcodeorg.ppplugin.data.DependencyResolutionException;
@@ -28,6 +29,7 @@ class ContextBuilder {
 	private static final String DEFAULT_COMPILED_CLASSES_SUB = "classes";
 	private boolean initialized = false;
 	private BuildLog log;
+	private List<String> declaredProcessors;
 
 	public ContextBuilder() {
 
@@ -37,6 +39,7 @@ class ContextBuilder {
 			throws FileNotFoundException, IOException, DependencyResolutionException {
 		if (initialized)
 			return;
+		declaredProcessors = dataSource.getDeclaredProcessors();
 		setupDirectories(dataSource);
 		log = dataSource.getLog();
 		setupFixedClassPathEntries(dataSource);
@@ -45,13 +48,46 @@ class ContextBuilder {
 
 	public PContextImpl createContext(BuildLog log, ClassLoader parentLoader,
 			ErrorHandler<? super Throwable, ? super File> handler)
-					throws ClassNotFoundException, MalformedURLException {
+			throws ClassNotFoundException, MalformedURLException {
 		Set<File> classFiles = createClassFilesSet();
 		ClassLoader loader = createInitializationClassLoader(parentLoader);
 		Map<Class<?>, File> classMap = createClassFileMap(loader, classFiles, handler);
 		List<String> classPathList = new ArrayList<String>();
 		classPathList.addAll(fixedClassPathEntries);
-		PContextImpl result = new PContextImpl(log, compilationResultsRoot, classPathList, classMap.keySet(), classMap);
+		Set<Class<? extends PProcessor>> declaredProcessors = buildDeclaredProcessors(loader, null); // TODO:
+																										// Edit
+		PContextImpl result = new PContextImpl(log, compilationResultsRoot, classPathList, classMap.keySet(), classMap,
+				declaredProcessors);
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<Class<? extends PProcessor>> buildDeclaredProcessors(ClassLoader initializationClassLoader,
+			ErrorHandler<? super Throwable, ? super String> handler) throws ClassNotFoundException {
+		Set<Class<? extends PProcessor>> result = new HashSet<Class<? extends PProcessor>>();
+		if (declaredProcessors.isEmpty())
+			return result;
+		log.info("Searching for explicit declared processors...");
+		Class<PProcessor> expectedClass = PProcessor.class;
+		Class<?> tmp;
+		for (String declared : declaredProcessors) {
+			log.debug(String.format("Searching class for declared processor with the given name: %s", declared));
+			try {
+				tmp = initializationClassLoader.loadClass(declared);
+				if (expectedClass.isAssignableFrom(tmp)) {
+					result.add((Class<? extends PProcessor>) tmp);
+				} else {
+					throw new RuntimeException(String.format(
+							"The declared processor '%s' does not implement the PProcessor interface.", declared));
+				}
+			} catch (RuntimeException e) {
+				executeHandler(handler, e, declared);
+			} catch (ClassNotFoundException e) {
+				executeHandler(handler, e, declared);
+			} catch (NoClassDefFoundError e) {
+				executeHandler(handler, e, declared);
+			}
+		}
 		return result;
 	}
 
@@ -79,7 +115,7 @@ class ContextBuilder {
 		return result;
 	}
 
-	private <T extends Throwable> void executeHandler(ErrorHandler<? super T, ? super File> handler, T e, File extra)
+	private <T extends Throwable, S> void executeHandler(ErrorHandler<? super T, ? super S> handler, T e, S extra)
 			throws T {
 		if (handler == null)
 			throw e;

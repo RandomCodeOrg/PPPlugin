@@ -1,5 +1,7 @@
 package com.github.randomcodeorg.ppplugin;
 
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -20,6 +22,9 @@ public class PostProcessMojo extends AbstractMojo {
 	private String projectBuildDir;
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)
 	private MavenProject project;
+	@Parameter
+	private List<String> processors;
+	
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -47,6 +52,10 @@ public class PostProcessMojo extends AbstractMojo {
 	@Override
 	public Log getLog() {
 		return super.getLog();
+	}
+	
+	public List<String> getDeclaredProcessors(){
+		return processors;
 	}
 
 }

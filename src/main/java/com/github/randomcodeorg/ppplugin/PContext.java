@@ -25,6 +25,7 @@ import com.github.randomcodeorg.ppplugin.internals.ConnectedStreams;
 public abstract class PContext {
 
 	private final Set<Class<?>> classes;
+	private final Set<Class<? extends PProcessor>> declaredProcessors;
 	private final Map<Class<?>, File> classFileMap;
 	private final BuildLog log;
 	private final File classRoot;
@@ -32,21 +33,30 @@ public abstract class PContext {
 	private final List<String> classPaths;
 
 	protected PContext(final BuildLog logger, File classRoot, List<String> classPaths, Set<Class<?>> classes,
-			Map<Class<?>, File> classFileMap) {
+			Map<Class<?>, File> classFileMap, Set<Class<? extends PProcessor>> declaredProcessors) {
 		this.classes = Collections.unmodifiableSet(classes);
 		this.classFileMap = classFileMap;
 		this.log = logger;
 		this.classRoot = classRoot;
 		this.classPaths = Collections.unmodifiableList(classPaths);
+		this.declaredProcessors = Collections.unmodifiableSet(declaredProcessors);
 	}
 
 	/**
-	 * Returns a unmodifiable set containing the projects compiled classes.
+	 * Returns an unmodifiable set containing the projects compiled classes.
 	 * 
-	 * @return A unmodifiable set containing the projects compiled classes.
+	 * @return An unmodifiable set containing the projects compiled classes.
 	 */
 	public Set<Class<?>> getClasses() {
 		return classes;
+	}
+	
+	/**
+	 * Returns an unmodifiable set containing additional processor classes.
+	 * @return An unmodifiable set containing additional processor classes.
+	 */
+	public Set<Class<? extends PProcessor>> getDeclaredProcessors(){
+		return declaredProcessors;
 	}
 
 	/**

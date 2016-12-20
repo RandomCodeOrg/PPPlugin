@@ -16,11 +16,20 @@ public class ProcessorManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Class<PProcessor> searchProcessors(PContext context) {
+	private Class<? extends PProcessor> searchProcessors(PContext context) {
 		String name;
+		for(Class<? extends PProcessor> p : context.getDeclaredProcessors()){
+			if(isValid(context, p)){
+				name = p.getCanonicalName();
+				if(!executedProcessors.contains(name)){
+					executedProcessors.add(name);
+					return p;
+				}
+			}
+		}
 		for (Class<?> c : context.getClasses()) {
 			if (PProcessor.class.isAssignableFrom(c)) {
-				Class<PProcessor> clp = (Class<PProcessor>) c;
+				Class<? extends PProcessor> clp = (Class<? extends PProcessor>) c;
 				if (isValid(context, clp)) {
 					name = clp.getCanonicalName();
 					if(!executedProcessors.contains(name)){
@@ -35,14 +44,14 @@ public class ProcessorManager {
 	}
 
 	public PProcessor next(PContext context) throws InstantiationException, IllegalAccessException {
-		Class<PProcessor> clp = searchProcessors(context);
+		Class<? extends PProcessor> clp = searchProcessors(context);
 		if(clp == null) return null;
 		context.getLog().info(String.format("Creating processor %s", clp.getName()));
 		PProcessor result = clp.newInstance();
 		return result;
 	}
 
-	private boolean isValid(PContext context, Class<PProcessor> type) {
+	private boolean isValid(PContext context, Class<? extends PProcessor> type) {
 		boolean result = !type.isInterface() && !Modifier.isAbstract(type.getModifiers());
 		if (result) {
 			try {
